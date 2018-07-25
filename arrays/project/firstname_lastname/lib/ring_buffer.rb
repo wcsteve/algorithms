@@ -1,5 +1,6 @@
 require_relative "static_array"
 require 'byebug'
+require 'pry'
 
 ## [0, 1, 3, 4, 5]
 
@@ -24,7 +25,7 @@ class RingBuffer
 
   # O(1)
   def []=(index, val)
-    realIndex = (index + self.start_idx + 1) % self.capacity
+    realIndex = (index + self.start_idx) 
     self.store[realIndex] = val
   end
 
@@ -59,9 +60,9 @@ class RingBuffer
   def unshift(val)
     resize! if self.length == self.capacity
     self.length += 1
+    self.start_idx -= 1
     first_idx = self.start_idx % self.capacity
     self.store[first_idx] = val
-    self.start_idx -= 1
     # debugger
     self
   end
@@ -75,12 +76,11 @@ class RingBuffer
   end
 
   def resize!
-    new_array = StaticArray.new(@capacity *= 2)
     self.capacity *= 2
+    new_array = StaticArray.new(@capacity)
 
     (self.length).times do |index|
-      realIndex = (index + self.start_idx) % self.length
-      new_array[index] = self.store[realIndex]
+      new_array[index] = self[index]
     end
 
     self.start_idx = 0
@@ -88,3 +88,5 @@ class RingBuffer
     self.store = new_array
   end
 end
+
+# binding.pry
